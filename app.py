@@ -14,6 +14,9 @@ app.config['MAIL_USERNAME'] = os.getenv('EMAIL_USER')
 app.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASS')
 mail = Mail(app)
 
+# Initial balance
+initial_balance = 8366.00
+
 # Define installment due dates and penalties
 installments_info = {
     "1081.50": {"due_date": "2024-08-15", "penalty": 51.50},
@@ -36,6 +39,8 @@ def calculate_penalties(installments):
     return penalties
 
 def send_confirmation_email(name, student_number, reference_number, email, payment_details, total_due, penalties, balance):
+    total_paid = total_due + penalties  # Calculate total amount paid (including penalties)
+    
     msg = Message("Payment Confirmation", sender=os.getenv('EMAIL_USER'), recipients=[email])
     
     msg.body = f"""
@@ -49,6 +54,7 @@ def send_confirmation_email(name, student_number, reference_number, email, payme
 
     Total Amount Due: {total_due} PHP
     Penalties Applied: {penalties} PHP
+    Total Amount Paid (including Penalties): {total_paid} PHP
     Balance: {balance} PHP
 
     If you have any questions, please contact ICCT Colleges at info@icct.edu.ph or call 270014228.
@@ -70,12 +76,27 @@ def pay():
     reference_number = request.form['reference_number']
     email = request.form['email']
     selected_installments = request.form.getlist('installments')
-    
+
+    # Calculate total due based on selected installments
     total_due = sum(float(installment) for installment in selected_installments)
+
+    # Calculate penalties for past due installments
     penalties = calculate_penalties(selected_installments)
 
-    # Calculate balance: Total due + penalties - payments made
-    balance = (total_due + penalties) - total_payments_made
+    # Total amount due including penalties
+    total_due_with_penalties = total_due + penalties
+
+    # Total payments made includes only the selected installments
+    total_payments_made = total_due
+
+    # Calculate balance
+    balance = initial_balance + penalties - total_payments_made  # Adjust balance calculation
+
+    # Ensure balance is not negative
+    balance = max(balance, 0)
+
+    # Round balance for display
+    balance = round(balance, 2)
 
     send_confirmation_email(name, student_number, reference_number, email, selected_installments, total_due, penalties, balance)
 

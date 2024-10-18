@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
     <title>Student Payment System</title>
 </head>
 <body>
     <div class="container">
         <h1>ICCT Colleges Payment Confirmation</h1>
-        <form action="/pay" method="post">
+        <form action="/pay" method="post" id="paymentForm">
             <label for="name">Name:</label>
             <input type="text" id="name" name="name" required>
 
@@ -45,5 +46,20 @@
             <button type="submit">Submit Payment</button>
         </form>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const paymentForm = document.getElementById('paymentForm');
+            const checkboxes = document.querySelectorAll('input[name="installments"]');
+
+            paymentForm.addEventListener('submit', function(event) {
+                const hasChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+                if (!hasChecked) {
+                    event.preventDefault(); // Prevent form submission
+                    alert("Please select at least one installment before submitting.");
+                }
+            });
+        });
+    </script>
 </body>
 </html>
