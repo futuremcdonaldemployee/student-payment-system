@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 from flask_mail import Mail, Message
 import os
 from dotenv import load_dotenv
+from datetime import datetime
 
 load_dotenv()
 
@@ -13,13 +14,25 @@ app.config['MAIL_USERNAME'] = os.getenv('EMAIL_USER')
 app.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASS')
 mail = Mail(app)
 
+# Define installment due dates and penalties
+installments_info = {
+    "1081.50": {"due_date": "2024-08-15", "penalty": 51.50},
+    "1733.13": {"due_date": "2024-09-03", "penalty": 82.53},
+    "1733.13": {"due_date": "2024-09-17", "penalty": 82.53},
+    "1733.13": {"due_date": "2024-10-02", "penalty": 82.53},
+    "1733.13": {"due_date": "2024-10-17", "penalty": 82.53},
+    "733.60": {"due_date": "2024-10-31", "penalty": 0.0},
+}
+
 def calculate_penalties(installments):
     penalties = 0.0
+    current_date = datetime.now().date()
+
     for installment in installments:
-        if installment == "1081.50":  # Downpayment
-            penalties += 51.50
-        elif installment in ["1733.13"]:  # 1st to 4th Installments
-            penalties += 82.53
+        due_date = datetime.strptime(installments_info[installment]["due_date"], "%Y-%m-%d").date()
+        if current_date > due_date:
+            penalties += installments_info[installment]["penalty"]
+    
     return penalties
 
 def send_confirmation_email(name, student_number, reference_number, email, payment_details, total_due, penalties, balance):
@@ -61,9 +74,8 @@ def pay():
     total_due = sum(float(installment) for installment in selected_installments)
     penalties = calculate_penalties(selected_installments)
 
-    # Get the payment made from the form or set a default value
-    payment_made = float(request.form.get('payment_made', 0.0))  # Default to 0.0 if not provided
-    balance = total_due - payment_made  # Calculate the balance
+    # Calculate balance: Total due + penalties - payments made
+    balance = total_due + penalties
 
     send_confirmation_email(name, student_number, reference_number, email, selected_installments, total_due, penalties, balance)
 
