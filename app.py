@@ -75,7 +75,7 @@ def pay():
     penalties = calculate_penalties(selected_installments)
 
     # Calculate balance: Total due + penalties - payments made
-    balance = total_due + penalties
+    balance = (total_due + penalties) - total_payments_made
 
     send_confirmation_email(name, student_number, reference_number, email, selected_installments, total_due, penalties, balance)
 
