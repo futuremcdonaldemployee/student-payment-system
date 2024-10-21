@@ -5,6 +5,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 import os
 from dotenv import load_dotenv
+import json
 from datetime import datetime
 
 # Load environment variables
@@ -27,8 +28,10 @@ mail = Mail(app)
 
 # Initialize Firebase
 try:
-    cred = credentials.Certificate(os.getenv('FIREBASE_KEY_PATH'))  # Firebase credentials path
-    firebase_admin.initialize_app(cred)
+    # Load the credentials from the environment variable
+    firebase_key = json.loads(os.getenv('FIREBASE_KEY'))  # Use the loaded JSON directly
+    cred = credentials.Certificate(firebase_key)  # Create credentials
+    firebase_admin.initialize_app(cred)  # Initialize Firebase
     db = firestore.client()  # Firestore database client
     print("Firebase successfully connected.")
 except Exception as e:
