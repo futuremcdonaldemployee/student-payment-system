@@ -1,50 +1,124 @@
+/* General Styles */
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
     margin: 0;
     padding: 0;
-    background-image: url('/static/icct_colleges.jpg'); /* Ensure the image path is correct */
+    background-image: url('/static/icct_colleges.jpg');
     background-size: cover;
     background-position: center;
+    background-attachment: fixed;
 }
 
 .container {
-    max-width: 600px; /* Limit the form width */
-    margin: 50px auto; /* Center the form with top margin */
-    padding: 20px; /* Padding around the form content */
-    background: rgba(255, 255, 255, 0.9); /* Slightly transparent white */
-    border-radius: 8px; /* Rounded corners */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+    max-width: 800px; /* Increased width for better layout */
+    margin: 50px auto; /* Center the container */
+    padding: 30px; /* Padding inside the container */
+    background: rgba(255, 255, 255, 0.9); /* Semi-transparent background */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Shadow effect */
 }
 
+/* Typography */
 h1 {
     text-align: center; /* Center the heading */
-    color: #0056b3; /* School color */
+    color: #0056b3; /* Heading color */
+    margin-bottom: 20px; /* Space below the heading */
 }
 
 label {
-    display: block; /* Labels take full width */
+    display: block; /* Block display for labels */
     margin: 10px 0 5px; /* Space around labels */
+    color: #333; /* Label color */
+    font-weight: bold; /* Bold labels */
 }
 
+/* Input Styles */
 input[type="text"],
 input[type="email"],
 button {
-    width: calc(100% - 30px); /* Full width minus left and right margins */
-    padding: 10px; /* Inner padding */
-    margin: 5px 0; /* Space between inputs and buttons */
-    border: 1px solid #ccc; /* Light border */
-    border-radius: 4px; /* Rounded corners */
-    margin-left: 15px; /* Increase left margin */
+    width: calc(100% - 30px); /* Full width minus padding */
+    padding: 12px; /* Inner padding */
+    margin: 5px 0; /* Margin above and below */
+    border: 1px solid #ddd; /* Light border */
+    border-radius: 5px; /* Rounded corners */
+    box-sizing: border-box; /* Include padding in width calculation */
 }
 
+/* Button Styles */
 button {
-    background-color: #4CAF50; /* Green color */
+    background-color: #4CAF50; /* Button color */
     color: white; /* Button text color */
     border: none; /* Remove border */
-    cursor: pointer; /* Pointer cursor on hover */
+    cursor: pointer; /* Pointer on hover */
+    transition: background-color 0.3s ease; /* Smooth background color transition */
 }
 
 button:hover {
-    background-color: #45a049; /* Darker shade on hover */
+    background-color: #45a049; /* Darker green on hover */
+}
+
+/* Installments Section */
+.installments label {
+    display: flex; /* Flexbox for alignment */
+    align-items: center; /* Center vertically */
+    margin: 8px 0; /* Space between installment options */
+}
+
+input[type="checkbox"] {
+    margin-right: 10px; /* Space between checkbox and label */
+}
+
+/* Flash Messages */
+.flashes {
+    margin-top: 20px; /* Space above flash messages */
+    list-style: none; /* Remove list styling */
+    padding: 0; /* No padding */
+    color: green; /* Message color */
+    font-weight: bold; /* Bold text */
+}
+
+/* Table Styles (for Payment Records) */
+table {
+    width: 100%; /* Full width for tables */
+    border-collapse: collapse; /* Merge table borders */
+    margin: 20px 0; /* Space above and below tables */
+}
+
+th, td {
+    padding: 12px; /* Space inside table cells */
+    text-align: left; /* Align text to the left */
+    border: 1px solid #ddd; /* Light border around cells */
+    overflow-wrap: break-word; /* Prevent overflow of content */
+}
+
+td {
+    max-width: 150px; /* Limit cell width for better layout */
+}
+
+/* Specific style for Date column */
+td:nth-child(7) { /* Assuming Date is the 7th column */
+    white-space: nowrap; /* Prevent wrapping for date */
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .container {
+        padding: 20px; /* Adjust padding for smaller screens */
+    }
+
+    input[type="text"],
+    input[type="email"],
+    button {
+        width: 100%; /* Full width on smaller screens */
+        margin-left: 0; /* Reset margin-left */
+    }
+
+    h1 {
+        font-size: 24px; /* Adjust heading size for smaller screens */
+    }
+
+    table {
+        font-size: 14px; /* Smaller font size for tables */
+    }
 }
