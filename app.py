@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, flash, url_for
 from flask_mail import Mail, Message
 from flask_wtf.csrf import CSRFProtect
 import os
+import re
 from dotenv import load_dotenv
 from datetime import datetime
 
@@ -9,7 +10,7 @@ from datetime import datetime
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.getenv('SECRET_KEY') or 'default_secret_key'  # Load secret key with fallback
+app.secret_key = os.getenv('SECRET_KEY') or 'default_secret_key'
 
 # Enable CSRF protection
 csrf = CSRFProtect(app)
@@ -39,26 +40,28 @@ installments_info = {
     "733.60": {"due_date": "2024-10-30", "penalty_rate": 0.05},
 }
 
+# Validate email format
+def is_valid_email(email):
+    return re.match(r"[^@]+@[^@]+\.[^@]+", email)
+
 # Calculate penalties for overdue installments
 def calculate_penalties(installments):
     penalties = 0.0
     current_date = datetime.now().date()
 
     for installment in installments:
-        value = installment.split('_')[0]  # Get the value of the installment (ignoring suffix)
+        value = installment.split('_')[0]
         if value in installments_info:
             due_date = datetime.strptime(installments_info[value]["due_date"], "%Y-%m-%d").date()
-            if current_date > due_date:  # If overdue
-                # Apply a fixed penalty instead of calculating it over days overdue
+            if current_date > due_date:
                 penalty_amount = float(value) * installments_info[value]["penalty_rate"]
-                penalties += penalty_amount  # Accumulate penalties based on the penalty rate
+                penalties += penalty_amount
 
     return round(penalties, 2)
 
-# Send the confirmation email
+# Send confirmation email
 def send_confirmation_email(name, student_number, email, payment_details, total_due, penalties, balance):
-    total_paid = total_due + penalties  # Total payment includes penalties
-
+    total_paid = total_due + penalties
     msg = Message("Payment Confirmation", sender=os.getenv('EMAIL_USER'), recipients=[email])
     msg.body = f"""
     Dear {name},
@@ -84,8 +87,8 @@ def save_payment_to_memory(name, student_number, email, total_due, penalties, ba
         "name": name,
         "student_number": student_number,
         "email": email,
-        "total_due": total_due,  # Only the due amount without penalties
-        "penalties": penalties,  # Store penalties separately
+        "total_due": total_due,
+        "penalties": penalties,
         "balance": balance,
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
@@ -110,18 +113,16 @@ def pay():
         flash('Please select at least one installment before submitting.', 'error')
         return redirect(url_for('index'))
 
-    # Calculate total due without penalties first
-    total_due = sum(float(installment.split('_')[0]) for installment in selected_installments)
-    # Calculate penalties based on selected installments
-    penalties = calculate_penalties(selected_installments)
+    if not is_valid_email(email):
+        flash('Please provide a valid email address.', 'error')
+        return redirect(url_for('index'))
 
-    # Total payments made includes penalties
+    total_due = sum(float(installment.split('_')[0]) for installment in selected_installments)
+    penalties = calculate_penalties(selected_installments)
     total_payments_made = total_due + penalties
-    # Calculate the remaining balance
     balance = max(initial_balance - total_payments_made, 0)
     balance = round(balance, 2)
 
-    # Prepare payment summary for display
     payment_summary = {
         "total_due": f"{total_due:.2f}",
         "penalties": f"{penalties:.2f}",
@@ -129,11 +130,9 @@ def pay():
         "remaining_balance": f"{balance:.2f}",
     }
 
-    # Send confirmation email and save to memory
     try:
         send_confirmation_email(name, student_number, email, selected_installments, total_due, penalties, balance)
         save_payment_to_memory(name, student_number, email, total_due, penalties, balance)
-
         flash('Payment processed successfully. Confirmation email sent.', 'success')
     except Exception as e:
         flash(f'An error occurred while processing your payment: {e}', 'error')
