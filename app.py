@@ -21,6 +21,7 @@ app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.getenv('EMAIL_USER')
 app.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASS')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('EMAIL_USER')  # Add this line
 
 mail = Mail(app)
 
@@ -62,7 +63,7 @@ def calculate_penalties(installments):
 # Send confirmation email
 def send_confirmation_email(name, student_number, email, payment_details, total_due, penalties, balance):
     total_paid = total_due + penalties
-    msg = Message("Payment Confirmation", sender=os.getenv('EMAIL_USER'), recipients=[email])
+    msg = Message("Payment Confirmation", recipients=[email])  # Removed sender here
     msg.body = f"""
     Dear {name},
 
