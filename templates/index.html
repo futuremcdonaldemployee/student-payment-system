@@ -10,6 +10,16 @@
     <div class="container">
         <h1>ICCT Colleges Payment Confirmation</h1>
 
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
         <form action="/pay" method="post" id="paymentForm">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
@@ -24,19 +34,68 @@
 
             <h2>Select Installments</h2>
             <div class="installments">
-                <label><input type="checkbox" name="installments" value="1081.50"> Downpayment - 1,081.50</label><br>
-                <label><input type="checkbox" name="installments" value="1733.13_1st"> 1st Installment - 1,733.13</label><br>
-                <label><input type="checkbox" name="installments" value="1733.13_2nd"> 2nd Installment - 1,733.13</label><br>
-                <label><input type="checkbox" name="installments" value="1733.13_3rd"> 3rd Installment - 1,733.13</label><br>
-                <label><input type="checkbox" name="installments" value="1733.13_4th"> 4th Installment - 1,733.13</label><br>
-                <label><input type="checkbox" name="installments" value="733.60"> 5th Installment - 733.60</label>
+                <label><input type="checkbox" name="installments" value="1030.00" data-due-date="2024-08-14"> Downpayment - 1,030.00 PHP (Due: Aug 14, 2024) <span class="penalty">5% penalty from Aug 15 onwards</span></label><br>
+                <label><input type="checkbox" name="installments" value="1650.60" data-due-date="2024-09-02"> 1st Installment - 1,650.60 PHP (Due: Sep 02, 2024) <span class="penalty">5% penalty from Sep 03 onwards</span></label><br>
+                <label><input type="checkbox" name="installments" value="1650.60" data-due-date="2024-09-16"> 2nd Installment - 1,650.60 PHP (Due: Sep 16, 2024) <span class="penalty">5% penalty from Sep 17 onwards</span></label><br>
+                <label><input type="checkbox" name="installments" value="1650.60" data-due-date="2024-10-01"> 3rd Installment - 1,650.60 PHP (Due: Oct 01, 2024) <span class="penalty">5% penalty from Oct 02 onwards</span></label><br>
+                <label><input type="checkbox" name="installments" value="1650.60" data-due-date="2024-10-16"> 4th Installment - 1,650.60 PHP (Due: Oct 16, 2024) <span class="penalty">5% penalty from Oct 17 onwards</span></label><br>
+                <label><input type="checkbox" name="installments" value="733.60" data-due-date="2024-10-30"> 5th Installment - 733.60 PHP (Due: Oct 30, 2024) <span class="penalty">5% penalty from Oct 31 onwards</span></label>
             </div>
+
+            <h2>Payment To Be Made</h2>
+            <p>Total Due: <span id="totalDue">0.00</span> PHP</p>
+            <p>Penalties: <span id="penalties">0.00</span> PHP</p>
+            <p>Total Paid (with penalties): <span id="totalPaid">0.00</span> PHP</p>
+            <p>Remaining Balance: <span id="remainingBalance">8366.00</span> PHP</p>
 
             <button type="submit" id="submitBtn" disabled>Submit Payment</button>
         </form>
+
+        {% if payment_summary %}
+            <h2>Payment Summary</h2>
+            <p>Total Due: {{ payment_summary.total_due }} PHP</p>
+            <p>Penalties: {{ payment_summary.penalties }} PHP</p>
+            <p>Total Paid (with penalties): {{ payment_summary.total_paid }} PHP</p>
+            <p>Remaining Balance: {{ payment_summary.remaining_balance }} PHP</p>
+        {% endif %}
     </div>
 
     <script>
+        const initialBalance = 8366.00; // Initial balance for calculations
+        const penaltyRate = 0.05; // Penalty rate for late payments
+
+        function updateSummary() {
+            const checkboxes = document.querySelectorAll('input[name="installments"]:checked');
+            let totalPaymentsMade = 0; // Total payments made by the user
+            let totalPenalties = 0; // Total penalties incurred
+
+            checkboxes.forEach(checkbox => {
+                const value = parseFloat(checkbox.value);
+                let paymentAmount = value;
+
+                const dueDateStr = checkbox.getAttribute('data-due-date');
+                const dueDate = new Date(dueDateStr);
+                const currentDate = new Date();
+
+                // Check if overdue and apply penalty
+                if (currentDate > dueDate) {
+                    const penalty = value * penaltyRate;
+                    totalPenalties += penalty;
+                }
+
+                totalPaymentsMade += value;
+            });
+
+            const totalDue = totalPaymentsMade.toFixed(2);
+            const totalPaid = (totalPaymentsMade + totalPenalties).toFixed(2);
+            const remainingBalance = (initialBalance - totalPaid).toFixed(2);
+
+            document.getElementById('totalDue').textContent = totalDue;
+            document.getElementById('penalties').textContent = totalPenalties.toFixed(2);
+            document.getElementById('totalPaid').textContent = totalPaid;
+            document.getElementById('remainingBalance').textContent = Math.max(remainingBalance, 0).toFixed(2);
+        }
+
         document.addEventListener("DOMContentLoaded", function () {
             const checkboxes = document.querySelectorAll('input[name="installments"]');
             const submitBtn = document.getElementById('submitBtn');
@@ -44,8 +103,12 @@
             checkboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', function () {
                     submitBtn.disabled = !Array.from(checkboxes).some(i => i.checked);
+                    updateSummary(); // Update summary whenever a checkbox is checked/unchecked
                 });
             });
+
+            // Initial call to update the summary in case of pre-selected checkboxes
+            updateSummary();
         });
     </script>
 </body>

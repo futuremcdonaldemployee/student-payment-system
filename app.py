@@ -31,32 +31,33 @@ initial_balance = 8366.00
 
 # Installment and penalty information
 installments_info = {
-    "1081.50": {"due_date": "2024-08-14", "penalty_rate": 0.05},
-    "1733.13_1st": {"due_date": "2024-09-02", "penalty_rate": 0.05},
-    "1733.13_2nd": {"due_date": "2024-09-16", "penalty_rate": 0.05},
-    "1733.13_3rd": {"due_date": "2024-10-01", "penalty_rate": 0.05},
-    "1733.13_4th": {"due_date": "2024-10-16", "penalty_rate": 0.05},
+    "1030.00": {"due_date": "2024-08-14", "penalty_rate": 0.05},
+    "1650.60": {"due_date": "2024-09-02", "penalty_rate": 0.05},
+    "1650.60": {"due_date": "2024-09-16", "penalty_rate": 0.05},
+    "1650.60": {"due_date": "2024-10-01", "penalty_rate": 0.05},
+    "1650.60": {"due_date": "2024-10-16", "penalty_rate": 0.05},
     "733.60": {"due_date": "2024-10-30", "penalty_rate": 0.05},
 }
 
+# Calculate penalties for overdue installments
 def calculate_penalties(installments):
     penalties = 0.0
     current_date = datetime.now().date()
 
     for installment in installments:
-        value = installment.split('_')[0]
-
+        value = installment.split('_')[0]  # Get the value of the installment (ignoring suffix)
         if value in installments_info:
             due_date = datetime.strptime(installments_info[value]["due_date"], "%Y-%m-%d").date()
-            if current_date > due_date:
-                days_overdue = (current_date - due_date).days
-                penalty_amount = float(value) * installments_info[value]["penalty_rate"] * days_overdue
-                penalties += penalty_amount
+            if current_date > due_date:  # If overdue
+                # Apply a fixed penalty instead of calculating it over days overdue
+                penalty_amount = float(value) * installments_info[value]["penalty_rate"]
+                penalties += penalty_amount  # Accumulate penalties based on the penalty rate
 
     return round(penalties, 2)
 
+# Send the confirmation email
 def send_confirmation_email(name, student_number, email, payment_details, total_due, penalties, balance):
-    total_paid = total_due + penalties
+    total_paid = total_due + penalties  # Total payment includes penalties
 
     msg = Message("Payment Confirmation", sender=os.getenv('EMAIL_USER'), recipients=[email])
     msg.body = f"""
@@ -77,13 +78,14 @@ def send_confirmation_email(name, student_number, email, payment_details, total_
     """
     mail.send(msg)
 
+# Save payment details to memory
 def save_payment_to_memory(name, student_number, email, total_due, penalties, balance):
     payment = {
         "name": name,
         "student_number": student_number,
         "email": email,
-        "total_due": total_due,
-        "penalties": penalties,
+        "total_due": total_due,  # Only the due amount without penalties
+        "penalties": penalties,  # Store penalties separately
         "balance": balance,
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
@@ -108,13 +110,26 @@ def pay():
         flash('Please select at least one installment before submitting.', 'error')
         return redirect(url_for('index'))
 
+    # Calculate total due without penalties first
     total_due = sum(float(installment.split('_')[0]) for installment in selected_installments)
+    # Calculate penalties based on selected installments
     penalties = calculate_penalties(selected_installments)
 
+    # Total payments made includes penalties
     total_payments_made = total_due + penalties
+    # Calculate the remaining balance
     balance = max(initial_balance - total_payments_made, 0)
     balance = round(balance, 2)
 
+    # Prepare payment summary for display
+    payment_summary = {
+        "total_due": f"{total_due:.2f}",
+        "penalties": f"{penalties:.2f}",
+        "total_paid": f"{total_payments_made:.2f}",
+        "remaining_balance": f"{balance:.2f}",
+    }
+
+    # Send confirmation email and save to memory
     try:
         send_confirmation_email(name, student_number, email, selected_installments, total_due, penalties, balance)
         save_payment_to_memory(name, student_number, email, total_due, penalties, balance)
@@ -123,11 +138,7 @@ def pay():
     except Exception as e:
         flash(f'An error occurred while processing your payment: {e}', 'error')
 
-    return redirect(url_for('payments'))
-
-@app.route('/payments')
-def payments_view():
-    return render_template('payments.html', payments=payments)
+    return render_template('index.html', payment_summary=payment_summary)
 
 if __name__ == "__main__":
     app.run(debug=True)
