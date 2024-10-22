@@ -11,114 +11,105 @@ body {
 }
 
 .container {
-    max-width: 800px; /* Increased width for better layout */
-    margin: 50px auto; /* Center the container */
-    padding: 30px; /* Padding inside the container */
-    background: rgba(255, 255, 255, 0.9); /* Semi-transparent background */
-    border-radius: 10px; /* Rounded corners */
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Shadow effect */
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* Typography */
 h1 {
-    text-align: center; /* Center the heading */
-    color: #0056b3; /* Heading color */
-    margin-bottom: 20px; /* Space below the heading */
+    text-align: center;
+    color: #0056b3;
+    margin-bottom: 20px;
 }
 
 label {
-    display: block; /* Block display for labels */
-    margin: 10px 0 5px; /* Space around labels */
-    color: #333; /* Label color */
-    font-weight: bold; /* Bold labels */
+    display: block;
+    margin: 10px 0 5px;
+    color: #333;
+    font-weight: bold;
 }
 
-/* Input Styles */
 input[type="text"],
 input[type="email"],
 button {
-    width: calc(100% - 30px); /* Full width minus padding */
-    padding: 12px; /* Inner padding */
-    margin: 5px 0; /* Margin above and below */
-    border: 1px solid #ddd; /* Light border */
-    border-radius: 5px; /* Rounded corners */
-    box-sizing: border-box; /* Include padding in width calculation */
+    width: calc(100% - 30px);
+    padding: 12px;
+    margin: 5px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
 }
 
-/* Button Styles */
 button {
-    background-color: #4CAF50; /* Button color */
-    color: white; /* Button text color */
-    border: none; /* Remove border */
-    cursor: pointer; /* Pointer on hover */
-    transition: background-color 0.3s ease; /* Smooth background color transition */
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 button:hover {
-    background-color: #45a049; /* Darker green on hover */
+    background-color: #45a049;
 }
 
-/* Installments Section */
 .installments label {
-    display: flex; /* Flexbox for alignment */
-    align-items: center; /* Center vertically */
-    margin: 8px 0; /* Space between installment options */
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
 }
 
 input[type="checkbox"] {
-    margin-right: 10px; /* Space between checkbox and label */
+    margin-right: 10px;
 }
 
-/* Flash Messages */
 .flashes {
-    margin-top: 20px; /* Space above flash messages */
-    list-style: none; /* Remove list styling */
-    padding: 0; /* No padding */
-    color: green; /* Message color */
-    font-weight: bold; /* Bold text */
+    margin-top: 20px;
+    list-style: none;
+    padding: 0;
+    color: green;
+    font-weight: bold;
 }
 
-/* Table Styles (for Payment Records) */
 table {
-    width: 100%; /* Full width for tables */
-    border-collapse: collapse; /* Merge table borders */
-    margin: 20px 0; /* Space above and below tables */
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
 }
 
 th, td {
-    padding: 12px; /* Space inside table cells */
-    text-align: left; /* Align text to the left */
-    border: 1px solid #ddd; /* Light border around cells */
-    overflow-wrap: break-word; /* Prevent overflow of content */
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+    overflow-wrap: break-word;
 }
 
 td {
-    max-width: 150px; /* Limit cell width for better layout */
+    max-width: 150px;
 }
 
-/* Specific style for Date column */
-td:nth-child(7) { /* Assuming Date is the 7th column */
-    white-space: nowrap; /* Prevent wrapping for date */
+td:nth-child(7) {
+    white-space: nowrap;
 }
 
-/* Responsive Design */
 @media (max-width: 600px) {
     .container {
-        padding: 20px; /* Adjust padding for smaller screens */
+        padding: 20px;
     }
 
     input[type="text"],
     input[type="email"],
     button {
-        width: 100%; /* Full width on smaller screens */
-        margin-left: 0; /* Reset margin-left */
+        width: 100%;
     }
 
     h1 {
-        font-size: 24px; /* Adjust heading size for smaller screens */
+        font-size: 24px;
     }
 
     table {
-        font-size: 14px; /* Smaller font size for tables */
+        font-size: 14px;
     }
 }

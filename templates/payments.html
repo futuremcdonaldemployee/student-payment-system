@@ -1,14 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Records</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <title>Payment Records</title>
 </head>
+
 <body>
     <div class="container">
         <h1>Payment Records</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
         <table>
             <thead>
                 <tr>
@@ -24,18 +38,20 @@
             <tbody>
                 {% for payment in payments %}
                     <tr>
-                        <td>{{ payment.name }}</td>
-                        <td>{{ payment.student_number }}</td>
-                        <td>{{ payment.email }}</td>
-                        <td>{{ payment.total_due }}</td>
-                        <td>{{ payment.penalties }}</td>
-                        <td>{{ payment.balance }}</td>
-                        <td>{{ payment.timestamp.strftime('%Y-%m-%d') }}</td> <!-- Format the date -->
+                        <td>{{ payment['name'] }}</td>
+                        <td>{{ payment['student_number'] }}</td>
+                        <td>{{ payment['email'] }}</td>
+                        <td>{{ payment['total_due'] }}</td>
+                        <td>{{ payment['penalties'] }}</td>
+                        <td>{{ payment['balance'] }}</td>
+                        <td>{{ payment['timestamp'] }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <a href="{{ url_for('index') }}" class="back-button">Back to Home</a>
+
+        <a href="{{ url_for('index') }}">Back to Payment Form</a>
     </div>
 </body>
+
 </html>

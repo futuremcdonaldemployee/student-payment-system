@@ -1,20 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     <title>Student Payment System</title>
 </head>
-
 <body>
     <div class="container">
         <h1>ICCT Colleges Payment Confirmation</h1>
 
         <form action="/pay" method="post" id="paymentForm">
-            <!-- Proper CSRF Handling -->
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
             <label for="name">Name:</label>
@@ -28,12 +24,12 @@
 
             <h2>Select Installments</h2>
             <div class="installments">
-                <label><input type="checkbox" name="installments" value="1030.00"> Downpayment - 1,081.50 (Late, +51.50 Penalty)</label>
-                <label><input type="checkbox" name="installments" value="1650.60_1st"> 1st Installment - 1,733.13 (Late, +82.53 Penalty)</label>
-                <label><input type="checkbox" name="installments" value="1650.60_2nd"> 2nd Installment - 1,733.13 (Late, +82.53 Penalty)</label>
-                <label><input type="checkbox" name="installments" value="1650.60_3rd"> 3rd Installment - 1,733.13 (Late, +82.53 Penalty)</label>
-                <label><input type="checkbox" name="installments" value="1650.60_4th"> 4th Installment - 1,733.13 (Late, +82.53 Penalty)</label>
-                <label><input type="checkbox" name="installments" value="733.60"> 5th Installment - 733.60 (Late, +36.68 Penalty)</label>
+                <label><input type="checkbox" name="installments" value="1081.50"> Downpayment - 1,081.50</label><br>
+                <label><input type="checkbox" name="installments" value="1733.13_1st"> 1st Installment - 1,733.13</label><br>
+                <label><input type="checkbox" name="installments" value="1733.13_2nd"> 2nd Installment - 1,733.13</label><br>
+                <label><input type="checkbox" name="installments" value="1733.13_3rd"> 3rd Installment - 1,733.13</label><br>
+                <label><input type="checkbox" name="installments" value="1733.13_4th"> 4th Installment - 1,733.13</label><br>
+                <label><input type="checkbox" name="installments" value="733.60"> 5th Installment - 733.60</label>
             </div>
 
             <button type="submit" id="submitBtn" disabled>Submit Payment</button>
@@ -42,25 +38,15 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const paymentForm = document.getElementById('paymentForm');
             const checkboxes = document.querySelectorAll('input[name="installments"]');
             const submitBtn = document.getElementById('submitBtn');
 
-            // Enable button only if at least one installment is selected
             checkboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', () => {
-                    submitBtn.disabled = ![...checkboxes].some(c => c.checked);
+                checkbox.addEventListener('change', function () {
+                    submitBtn.disabled = !Array.from(checkboxes).some(i => i.checked);
                 });
-            });
-
-            paymentForm.addEventListener('submit', function (event) {
-                if (![...checkboxes].some(checkbox => checkbox.checked)) {
-                    event.preventDefault();
-                    alert("Please select at least one installment before submitting.");
-                }
             });
         });
     </script>
 </body>
-
 </html>
